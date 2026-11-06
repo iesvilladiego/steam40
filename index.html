@@ -2308,6 +2308,23 @@
             chip.classList.remove('hidden');
         }
 
+        // Respaldo cuando el service worker activo no implementa la consulta
+        // de versión: se lee el propio sw.js publicado y se extrae su constante
+        // VERSION. El parámetro de consulta (?v=...) hace que la URL no coincida
+        // con la copia guardada en caché (estrategia "caché primero" del SW para
+        // recursos propios) y que el navegador no sirva su copia HTTP cacheada,
+        // de modo que se obtiene siempre el sw.js realmente publicado.
+        function pedirVersionPorFetch() {
+            fetch('./sw.js?v=' + Date.now(), { cache: 'no-store' })
+                .then((respuesta) => (respuesta.ok ? respuesta.text() : null))
+                .then((texto) => {
+                    if (!texto) return;
+                    const coincidencia = texto.match(/const\s+VERSION\s*=\s*'([^']+)'/);
+                    if (coincidencia) mostrarVersionEnChip(coincidencia[1]);
+                })
+                .catch(() => { /* sin red ni SW: el chip permanece oculto */ });
+        }
+
         function pedirVersionAlServiceWorker() {
             if (!('serviceWorker' in navigator)) return;
             // "ready" espera a que exista un service worker activo para este
@@ -2315,14 +2332,20 @@
             // siguientes (ya activo desde el arranque).
             navigator.serviceWorker.ready.then((registro) => {
                 const worker = registro.active;
-                if (!worker) return;
+                if (!worker) { pedirVersionPorFetch(); return; }
+                let respondido = false;
                 const canal = new MessageChannel();
                 canal.port1.onmessage = (evento) => {
+                    respondido = true;
                     if (evento.data && evento.data.type === 'VERSION') {
                         mostrarVersionEnChip(evento.data.version);
                     }
                 };
                 worker.postMessage({ type: 'GET_VERSION' }, [canal.port2]);
+                // Si el SW activo es una versión desplegada sin el manejador
+                // GET_VERSION, no habrá respuesta: a los 1,5 s se recurre a
+                // leer la versión del sw.js publicado.
+                setTimeout(() => { if (!respondido) pedirVersionPorFetch(); }, 1500);
             }).catch(() => { /* sin service worker activo: chip oculto */ });
         }
 
