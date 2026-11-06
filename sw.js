@@ -42,7 +42,7 @@
 
 'use strict';
 
-const VERSION = 'v1.2.0';
+const VERSION = 'v1.2.1';
 const CACHE_NAME = 'steam40-evidencias-' + VERSION;
 const TIEMPO_LIMITE_NAV = 5000; // ms: máx. espera de red en navegaciones
 
@@ -134,10 +134,16 @@ self.addEventListener('activate', (event) => {
 });
 
 /* ------------------------------------------------------------------
- * Mensajes desde la página (p. ej. forzar la activación de una update)
+ * Mensajes desde la página (forzar la activación de una update o
+ * consultar la versión instalada para el chip del encabezado)
  * ------------------------------------------------------------------ */
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
+  // Consulta de versión: se responde por el MessageChannel que abrió la
+  // página, de modo que la respuesta solo la reciba quien preguntó.
+  if (event.data && event.data.type === 'GET_VERSION' && event.ports && event.ports[0]) {
+    event.ports[0].postMessage({ type: 'VERSION', version: VERSION });
+  }
 });
 
 /* ------------------------------------------------------------------
