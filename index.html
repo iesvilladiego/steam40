@@ -220,12 +220,12 @@
                 </button>
 
                 <!-- Conexión con la cuenta de Google Drive del usuario -->
-                <button onclick="onConnectButtonClicked()" id="btn-drive-connect" class="text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5 border border-white/15" title="Conectar con mi Google Drive">
+                <button onclick="onConnectButtonClicked()" id="btn-drive-connect" class="text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5 border border-white/15" title="Conectar con tu cuenta de Google Drive">
                     <i class="fa-brands fa-google-drive text-emerald-300"></i>
-                    <span id="btn-drive-connect-label">Conectar mi Drive</span>
+                    <span id="btn-drive-connect-label">Conectar Google Drive</span>
                 </button>
 
-                <button onclick="openDriveSettings()" id="btn-drive-settings" class="text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white px-2.5 py-2 rounded-lg font-medium transition border border-white/15" title="Configurar conexión con mi Google Drive (ID de cliente OAuth y carpeta destino)">
+                <button onclick="openDriveSettings()" id="btn-drive-settings" class="text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white px-2.5 py-2 rounded-lg font-medium transition border border-white/15" title="Configurar conexión con Google Drive (ID de cliente OAuth)">
                     <i class="fa-solid fa-gear"></i>
                 </button>
 
@@ -322,10 +322,9 @@
                                     <option value="2º ESO"></option>
                                     <option value="3º ESO"></option>
                                     <option value="4º ESO"></option>
-                                    <option value="1º Bachillerato"></option>
                                     <option value="2º Bachillerato"></option>
-                                    <option value="Ciclo Formativo / FP Básica"></option>
-                                    <option value="Aula Específica / Diversificación"></option>
+                                    <option value="Aula Específica"></option>
+                                    <option value="Diversificación Curricular"></option>
                                 </datalist>
                             </div>
                         </div>
@@ -487,11 +486,11 @@
                             <span>Descargar PDF</span>
                         </button>
 
-                        <!-- Botón 2: Generar PDF y Subirlo a mi Google Drive conectado -->
+                        <!-- Botón 2: Generar PDF y Subirlo a la carpeta del instituto (Drive conectado) -->
                         <button onclick="openDriveUploadWorkflow()" id="btn-drive-upload"
                             class="flex-1 sm:flex-initial justify-center bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-md">
                             <i class="fa-brands fa-google-drive text-base"></i>
-                            <span id="btn-drive-upload-label">Subir PDF a mi Drive</span>
+                            <span id="btn-drive-upload-label">Subir PDF al Drive del instituto</span>
                         </button>
                     </div>
                 </div>
@@ -666,30 +665,28 @@
                     </div>
                 </div>
 
-                <!-- Subida automática a la cuenta conectada del usuario -->
+                <!-- Subida automática a la carpeta del Drive del instituto -->
                 <div id="modal-drive-connected" class="hidden border border-emerald-300 rounded-xl p-4 bg-emerald-50/60">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-bolt text-amber-500"></i> Subida automática a Mi Drive (cuenta conectada)
+                        <i class="fa-solid fa-bolt text-amber-500"></i> Subida automática desde la aplicación (cuenta conectada)
                     </h4>
                     <div class="flex items-center gap-2 text-xs text-slate-700 mb-3">
                         <img id="modal-drive-avatar" src="" alt="" class="w-6 h-6 rounded-full border border-slate-300 hidden">
                         <i id="modal-drive-avatar-icon" class="fa-solid fa-circle-user text-emerald-600 text-lg"></i>
                         <span id="modal-drive-email" class="font-semibold"></span>
                     </div>
-                    <label class="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">Carpeta destino en tu Drive</label>
-                    <div class="flex gap-2 mb-3">
-                        <select id="modal-folder-select" onchange="onModalFolderSelected()"
-                            class="flex-grow px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-                            <option value="">Mi Drive (raíz)</option>
-                        </select>
-                        <button type="button" onclick="refreshDriveFolders()" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-600 px-2.5 py-2 rounded-lg text-xs shrink-0" title="Actualizar lista de carpetas">
-                            <i class="fa-solid fa-rotate"></i>
-                        </button>
-                    </div>
-                    <button type="button" onclick="uploadPdfToMyDrive()" id="btn-modal-upload"
+
+                    <!-- Destino único: carpeta compartida del instituto -->
+                    <p class="text-[11px] text-slate-600 bg-white border border-emerald-200 rounded-lg px-3 py-2 mb-3 leading-relaxed">
+                        <i class="fa-solid fa-school text-emerald-600"></i>
+                        El PDF se guardará directamente en la carpeta compartida del <strong>PROYECTO STEAM VILLADIEGO</strong> en el Google Drive del instituto. Tu cuenta de Google debe tener permiso de <strong>edición</strong> sobre esa carpeta.
+                        <a href="https://drive.google.com/drive/folders/1pwoT1VtoqGzuqv8A_eTzJY2VLfn_Uik2?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-steam-700 underline font-semibold">Ver la carpeta</a>
+                    </p>
+
+                    <button type="button" onclick="uploadPdfToInstituto()" id="btn-modal-upload"
                         class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>Subir ahora a mi Google Drive</span>
+                        <span id="btn-modal-upload-label">Subir ahora a la carpeta del instituto</span>
                     </button>
                     <div id="modal-upload-status" class="text-xs hidden rounded-lg p-2.5 mt-3"></div>
                 </div>
@@ -697,10 +694,10 @@
                 <!-- Guía de conexión cuando no hay cuenta conectada -->
                 <div id="modal-drive-disconnected" class="border border-sky-200 rounded-xl p-4 bg-sky-50/70">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-sky-800 mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-plug-circle-bolt text-sky-600"></i> Subida en 1 clic a tu propia cuenta de Drive
+                        <i class="fa-solid fa-plug-circle-bolt text-sky-600"></i> Subida en 1 clic a la carpeta del instituto
                     </h4>
                     <p class="text-xs text-slate-600 mb-3 leading-relaxed">
-                        Conecta tu cuenta de Google para subir el PDF directamente a <strong>tu Google Drive</strong> sin salir de la aplicación. Solo tendrás que configurar una vez tu ID de cliente OAuth en <i class="fa-solid fa-gear"></i> (panel superior).
+                        Conecta tu cuenta de Google para subir el PDF directamente a la <strong>carpeta compartida del PROYECTO STEAM VILLADIEGO</strong> (Google Drive del instituto) sin salir de la aplicación. Solo tendrás que configurar una vez tu ID de cliente OAuth en <i class="fa-solid fa-gear"></i> (panel superior).
                     </p>
                     <div class="flex flex-col sm:flex-row gap-2">
                         <button type="button" onclick="onConnectButtonClicked()" class="flex-1 bg-sky-700 hover:bg-sky-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2">
@@ -742,7 +739,7 @@
 
                     <div id="advanced-drive-api" class="hidden mt-3 pt-3 border-t border-slate-100 space-y-3">
                         <p class="text-[11px] text-slate-500 leading-normal">
-                            Si dispones de un <em>Token de Acceso OAuth 2.0</em> con permisos de escritura en Google Drive API (<code class="bg-slate-100 px-1 rounded">drive.file</code> o <code class="bg-slate-100 px-1 rounded">drive</code>), introdúcelo aquí para transferir el PDF directamente <span id="api-destination-hint">a la carpeta compartida <code class="bg-slate-100 px-1 rounded">1pwoT1VtoqGzuqv8A_eTzJY2VLfn_Uik2</code></span> sin salir de la aplicación:
+                            Si dispones de un <em>Token de Acceso OAuth 2.0</em> con permiso de escritura en Google Drive API (<code class="bg-slate-100 px-1 rounded">drive</code>), introdúcelo aquí para transferir el PDF directamente <span id="api-destination-hint">a la carpeta compartida <code class="bg-slate-100 px-1 rounded">1pwoT1VtoqGzuqv8A_eTzJY2VLfn_Uik2</code></span> sin salir de la aplicación:
                         </p>
                         <input type="password" id="gdrive-oauth-token" placeholder="Pegar Bearer Access Token de Google Drive API (ya29.a0...)"
                             class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-steam-500 outline-none font-mono">
@@ -769,7 +766,7 @@
             <div class="bg-slate-800 px-6 py-4 text-white flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-gear text-amber-400"></i>
-                    <h3 class="font-bold text-base">Conexión con mi Google Drive</h3>
+                    <h3 class="font-bold text-base">Conexión con Google Drive</h3>
                 </div>
                 <button onclick="closeDriveSettings()" class="text-white/80 hover:text-white text-lg">
                     <i class="fa-solid fa-xmark"></i>
@@ -782,7 +779,7 @@
                     <i id="settings-state-icon" class="fa-solid fa-circle-xmark text-slate-400 text-xl"></i>
                     <div>
                         <p id="settings-state-title" class="font-bold text-sm text-slate-700">Sin conexión con Google Drive</p>
-                        <p id="settings-state-detail" class="text-slate-500">Configura tu ID de cliente OAuth y pulsa "Conectar mi Drive".</p>
+                        <p id="settings-state-detail" class="text-slate-500">Configura tu ID de cliente OAuth y pulsa "Conectar Google Drive".</p>
                     </div>
                 </div>
 
@@ -794,10 +791,11 @@
                     </h4>
                     <input type="text" id="input-oauth-clientid" placeholder="xxxxxxxx.apps.googleusercontent.com"
                         class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-steam-500 outline-none font-mono bg-white" spellcheck="false">
-                    <label class="flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
-                        <input type="checkbox" id="chk-broad-scope" class="mt-0.5 accent-emerald-600">
-                        <span><strong>Acceso a todas mis carpetas</strong> (permiso <code class="bg-slate-100 px-1 rounded">drive</code> en vez de <code class="bg-slate-100 px-1 rounded">drive.file</code>). Actívalo solo si quieres elegir cualquier carpeta existente de tu Drive; requiere volver a autorizar la aplicación.</span>
-                    </label>
+                    <p class="text-[11px] text-slate-600 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 leading-relaxed">
+                        <i class="fa-solid fa-school text-emerald-600"></i>
+                        Los PDF se subirán siempre a la carpeta compartida del <strong>PROYECTO STEAM VILLADIEGO</strong> en el Google Drive del instituto. La conexión solicitará permiso para ver, añadir y organizar archivos de tu Google Drive (necesario para escribir en la carpeta compartida).
+                        <a href="https://drive.google.com/drive/folders/1pwoT1VtoqGzuqv8A_eTzJY2VLfn_Uik2?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-steam-700 underline font-semibold">Ver la carpeta</a>
+                    </p>
                     <details class="text-[11px] text-slate-500">
                         <summary class="cursor-pointer font-semibold text-steam-700 hover:text-steam-600">¿Cómo consigo mi ID de cliente? (instrucciones)</summary>
                         <ol class="list-decimal ml-4 mt-2 space-y-1.5 leading-normal">
@@ -809,42 +807,6 @@
                             <li>Copia el <strong>ID de cliente</strong> (<em>…apps.googleusercontent.com</em>) y pégalo aquí arriba.</li>
                         </ol>
                     </details>
-                </div>
-
-                <!-- Paso 2: Carpeta destino -->
-                <div class="border border-slate-200 rounded-xl p-4 space-y-3">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                        <span class="w-5 h-5 rounded-md bg-steam-100 text-steam-700 flex items-center justify-center font-bold text-[11px]">2</span>
-                        Carpeta destino de los PDF en tu Drive
-                    </h4>
-                    <p id="settings-current-folder" class="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-                        <i class="fa-solid fa-folder text-amber-400"></i> <span id="settings-current-folder-name">Sin carpeta seleccionada (se creará "Evidencias STEAM4.0" en la raíz al subir)</span>
-                    </p>
-                    <div class="flex gap-2">
-                        <select id="select-dest-folder" class="flex-grow px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-steam-500 outline-none bg-white">
-                            <option value="">— Carpetas disponibles (conecta tu Drive) —</option>
-                        </select>
-                        <button type="button" onclick="refreshDriveFolders()" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-600 px-2.5 py-2 rounded-lg text-xs shrink-0" title="Actualizar lista de carpetas">
-                            <i class="fa-solid fa-rotate"></i>
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-slate-500 leading-normal" id="folder-list-hint">
-                        Con el permiso <code class="bg-slate-100 px-1 rounded">drive.file</code> solo se listan las carpetas creadas por esta aplicación. Para elegir cualquier carpeta existente, activa el acceso amplio en el paso 1 o pega abajo su URL/ID.
-                    </p>
-                    <div class="flex gap-2">
-                        <input type="text" id="input-new-folder" placeholder="Nombre de la carpeta nueva a crear en tu Drive"
-                            class="flex-grow px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-                        <button type="button" onclick="createAndUseFolder()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3.5 py-2 rounded-lg text-xs shrink-0">
-                            <i class="fa-solid fa-folder-plus"></i> Crear y usar
-                        </button>
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="input-folder-url" placeholder="Pegar URL o ID de una carpeta de mi Drive"
-                            class="flex-grow px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-steam-500 outline-none bg-white" spellcheck="false">
-                        <button type="button" onclick="useFolderFromUrl()" class="bg-steam-700 hover:bg-steam-800 text-white font-semibold px-3.5 py-2 rounded-lg text-xs shrink-0">
-                            <i class="fa-solid fa-check"></i> Usar esta
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Botonera -->
@@ -902,15 +864,15 @@
         // Catálogo oficial de materiales STEAM 4.0 / Villadiego para selección rápida
         const CATALOGO_MATERIALES = [
             "Placa Micro:bit",
-            "Robótica Educativa (mBot / LEGO Spike)",
-            "Arduino / ESP32",
+            "Arduino",
+            "ESP32 STEAMakers",
+            "ESP32 micro:STEAMakers",
             "Impresora 3D y Filamento PLA",
             "Kit de Sensores y Electrónica",
             "Kit e-Textiles / Costura Conductiva",
             "Croma y Equipo Audiovisual",
             "Gafas Realidad Virtual / Aumentada",
-            "Ordenadores / Chromebooks de Aula",
-            "Aula del Futuro / Espacios STEAM",
+            "Ordenadores de aula",
             "Software Diseño 3D (Tinkercad / FreeCAD)",
             "Scratch / MakeCode / Python",
             "Herramientas de Inteligencia Artificial",
@@ -923,7 +885,7 @@
         // Estado actual de la evidencia
         let currentEvidence = {
             id: null,
-            materiales: ["Placa Micro:bit", "Ordenadores / Chromebooks de Aula"],
+            materiales: ["Placa Micro:bit", "Ordenadores de aula"],
             enlaces: [],
             fotos: []
         };
@@ -1262,7 +1224,7 @@
                 "Kit de Sensores y Electrónica",
                 "Impresora 3D y Filamento PLA",
                 "Scratch / MakeCode / Python",
-                "Ordenadores / Chromebooks de Aula"
+                "Ordenadores de aula"
             ];
 
             currentEvidence.enlaces = [
@@ -1735,14 +1697,14 @@
         // =========================================================================
         // CONEXIÓN CON EL GOOGLE DRIVE DEL USUARIO
         // Google Identity Services (OAuth 2.0 implícito) + Google Drive API v3
+        // La subida se realiza siempre a la carpeta compartida del instituto
+        // (DRIVE_FOLDER_ID), por lo que se solicita el permiso amplio "drive".
         // =========================================================================
-        const DRIVE_SCOPES_BASE = 'https://www.googleapis.com/auth/drive.file openid email profile';
         const DRIVE_SCOPES_FULL = 'https://www.googleapis.com/auth/drive openid email profile';
         const DRIVE_CFG_KEY = 'steam40_drive_cfg';
         const DRIVE_TOKEN_KEY = 'steam40_drive_token';
-        const DEFAULT_FOLDER_NAME = 'Evidencias STEAM4.0';
 
-        let driveConfig = { clientId: '', folderId: '', folderName: '', broadScope: false };
+        let driveConfig = { clientId: '' };
         let driveSession = { token: '', expiresAt: 0, email: '', name: '', picture: '' };
         let tokenClient = null;
         let tokenCallbackResolve = null;
@@ -1787,7 +1749,7 @@
             if (!tokenClient) {
                 tokenClient = google.accounts.oauth2.initTokenClient({
                     client_id: driveConfig.clientId,
-                    scope: driveConfig.broadScope ? DRIVE_SCOPES_FULL : DRIVE_SCOPES_BASE,
+                    scope: DRIVE_SCOPES_FULL,
                     callback: (resp) => {
                         if (resp.error) {
                             if (tokenCallbackReject) { tokenCallbackReject(new Error(resp.error_description || resp.error)); tokenCallbackReject = null; }
@@ -1839,7 +1801,7 @@
             } catch (e) {
                 clearDriveSession();
                 updateDriveUI();
-                throw new Error('La sesión de Google Drive ha caducado. Pulsa de nuevo "Conectar mi Drive" para renovarla.');
+                throw new Error('La sesión de Google Drive ha caducado. Pulsa de nuevo "Conectar Google Drive" para renovarla.');
             }
         }
 
@@ -1861,7 +1823,7 @@
             } catch (e) { /* sin datos de perfil: no es bloqueante */ }
         }
 
-        // Botón superior "Conectar mi Drive" / chip de cuenta conectada
+        // Botón superior "Conectar Google Drive" / chip de cuenta conectada
         function onConnectButtonClicked() {
             if (isDriveConnected()) {
                 openDriveSettings();
@@ -1881,22 +1843,7 @@
                 showToast('Abriendo ventana de autorización de Google...');
                 await requestDriveToken('');
                 await refreshDriveAccountInfo();
-
-                // Primera conexión: crear carpeta destino por defecto en el Drive del usuario
-                if (!driveConfig.folderId) {
-                    try {
-                        const folder = await createDriveFolder(DEFAULT_FOLDER_NAME);
-                        driveConfig.folderId = folder.id;
-                        driveConfig.folderName = DEFAULT_FOLDER_NAME;
-                        saveDriveConfig();
-                        showToast(`Conectado a tu Drive. Carpeta "${DEFAULT_FOLDER_NAME}" creada como destino.`);
-                    } catch (e) {
-                        showToast('Conectado a tu Drive. Los PDF se subirán a la raíz de Mi Drive.');
-                    }
-                } else {
-                    showToast('Google Drive conectado correctamente');
-                }
-                await refreshDriveFolders();
+                showToast('Google Drive conectado. Los PDF se subirán a la carpeta del instituto.');
                 updateDriveUI();
             } catch (e) {
                 showToast('No se pudo conectar con Google Drive: ' + (e.message || 'autorización cancelada'), true);
@@ -1911,164 +1858,16 @@
             }
             clearDriveSession();
             updateDriveUI();
-            renderDriveFolderSelects();
             showToast('Desconectado de Google Drive');
         }
 
-        // Listar las carpetas visibles de tu Drive (con drive.file: las creadas por la app; con drive: todas)
-        async function listMyDriveFolders() {
-            const token = await ensureFreshDriveToken();
-            const q = encodeURIComponent("mimeType = 'application/vnd.google-apps.folder' and trashed = false and 'root' in parents");
-            const resp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&pageSize=100&orderBy=name&fields=files(id,name)`, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            if (!resp.ok) {
-                const err = await resp.json().catch(() => ({}));
-                throw new Error(err.error?.message || ('HTTP ' + resp.status));
-            }
-            const data = await resp.json();
-            return data.files || [];
-        }
-
-        async function refreshDriveFolders() {
-            if (!isDriveConnected() && !driveSession.token) {
-                showToast('Conecta primero tu Google Drive para ver carpetas.', true);
-                return [];
-            }
-            let folders = [];
-            try {
-                folders = await listMyDriveFolders();
-                window.__driveFolderCache = folders;
-                renderDriveFolderSelects(folders);
-            } catch (e) {
-                showToast('No se pudo leer la lista de carpetas: ' + e.message, true);
-            }
-            return folders;
-        }
-
-        // Poblar los dos desplegables de carpeta (modal de subida y panel de configuración)
-        function renderDriveFolderSelects(folders) {
-            if (folders === undefined) folders = window.__driveFolderCache || [];
-            const currentId = driveConfig.folderId || '';
-            const currentName = driveConfig.folderName || '';
-
-            ['modal-folder-select', 'select-dest-folder'].forEach(selectId => {
-                const sel = document.getElementById(selectId);
-                if (!sel) return;
-                sel.innerHTML = '';
-
-                const rootOpt = document.createElement('option');
-                rootOpt.value = '';
-                rootOpt.textContent = 'Mi Drive (raíz)';
-                sel.appendChild(rootOpt);
-
-                folders.forEach(f => {
-                    const opt = document.createElement('option');
-                    opt.value = f.id;
-                    opt.textContent = f.name;
-                    sel.appendChild(opt);
-                });
-
-                // Carpeta configurada manualmente por URL/ID aunque no esté en la lista
-                if (currentId && !folders.some(f => f.id === currentId)) {
-                    const opt = document.createElement('option');
-                    opt.value = currentId;
-                    opt.textContent = currentName ? `${currentName} (configurada)` : `Carpeta ${currentId}`;
-                    sel.appendChild(opt);
-                }
-
-                sel.value = currentId;
-            });
-
-            const nameEl = document.getElementById('settings-current-folder-name');
-            if (nameEl) {
-                nameEl.textContent = currentId
-                    ? `${currentName || 'Carpeta ' + currentId} (ID: ${currentId})`
-                    : `Sin carpeta seleccionada (se creará "${DEFAULT_FOLDER_NAME}" en la raíz al subir)`;
-            }
-        }
-
-        function onModalFolderSelected() {
-            const sel = document.getElementById('modal-folder-select');
-            driveConfig.folderId = sel.value;
-            driveConfig.folderName = sel.selectedOptions[0] ? sel.selectedOptions[0].textContent.replace(' (configurada)', '') : '';
-            saveDriveConfig();
-            renderDriveFolderSelects();
-            updateApiDestinationHint();
-        }
-
-        // Crear una carpeta nueva en la raíz del Drive del usuario
-        async function createDriveFolder(name) {
-            const token = await ensureFreshDriveToken();
-            const resp = await fetch('https://www.googleapis.com/drive/v3/files', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: name,
-                    mimeType: 'application/vnd.google-apps.folder',
-                    parents: ['root']
-                })
-            });
-            if (!resp.ok) {
-                const err = await resp.json().catch(() => ({}));
-                throw new Error(err.error?.message || ('HTTP ' + resp.status));
-            }
-            return await resp.json();
-        }
-
-        async function createAndUseFolder() {
-            const input = document.getElementById('input-new-folder');
-            const name = input.value.trim();
-            if (!name) {
-                showToast('Escribe un nombre para la carpeta nueva.', true);
-                return;
-            }
-            try {
-                const folder = await createDriveFolder(name);
-                driveConfig.folderId = folder.id;
-                driveConfig.folderName = name;
-                saveDriveConfig();
-                input.value = '';
-                await refreshDriveFolders();
-                updateDriveUI();
-                showToast(`Carpeta "${name}" creada en tu Google Drive`);
-            } catch (e) {
-                showToast('No se pudo crear la carpeta: ' + e.message, true);
-            }
-        }
-
-        // Usar una carpeta existente pegando su URL o su ID
-        function useFolderFromUrl() {
-            const input = document.getElementById('input-folder-url');
-            const raw = input.value.trim();
-            if (!raw) {
-                showToast('Pega la URL o el ID de la carpeta de tu Drive.', true);
-                return;
-            }
-            const m = raw.match(/folders\/([a-zA-Z0-9_-]{15,})/) || raw.match(/^([a-zA-Z0-9_-]{15,})$/);
-            if (!m) {
-                showToast('URL o ID de carpeta no reconocido.', true);
-                return;
-            }
-            driveConfig.folderId = m[1];
-            driveConfig.folderName = 'Carpeta de mi Drive';
-            saveDriveConfig();
-            input.value = '';
-            renderDriveFolderSelects();
-            updateDriveUI();
-            showToast('Carpeta destino actualizada');
-        }
-
-        // Subida del PDF generado directamente a la carpeta del Drive del usuario
-        async function uploadPdfToMyDrive() {
+        // Subida del PDF generado a la carpeta compartida del instituto (DRIVE_FOLDER_ID)
+        async function uploadPdfToInstituto() {
             const statusBox = document.getElementById('modal-upload-status');
             const btn = document.getElementById('btn-modal-upload');
 
             if (!driveSession.token) {
-                showToast('Conecta primero tu Google Drive (botón "Conectar mi Drive").', true);
+                showToast('Conecta primero tu Google Drive (botón "Conectar Google Drive").', true);
                 return;
             }
 
@@ -2083,30 +1882,18 @@
 
             try {
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Subiendo a mi Drive...</span>';
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Subiendo a la carpeta del instituto...</span>';
                 setUploadStatus('<i class="fa-solid fa-spinner fa-spin mr-1"></i> Comprobando sesión de Google...', 'info');
 
                 const token = await ensureFreshDriveToken();
-
-                // Garantizar carpeta destino (por defecto se crea en la primera conexión)
-                let folderId = driveConfig.folderId;
-                if (!folderId) {
-                    setUploadStatus('<i class="fa-solid fa-spinner fa-spin mr-1"></i> Creando carpeta "' + DEFAULT_FOLDER_NAME + '"...', 'info');
-                    const folder = await createDriveFolder(DEFAULT_FOLDER_NAME);
-                    folderId = folder.id;
-                    driveConfig.folderId = folder.id;
-                    driveConfig.folderName = DEFAULT_FOLDER_NAME;
-                    saveDriveConfig();
-                    renderDriveFolderSelects();
-                }
 
                 const filename = getCleanFilename();
                 setUploadStatus('<i class="fa-solid fa-spinner fa-spin mr-1"></i> Generando el documento PDF...', 'info');
                 const pdfBlob = await generatePdfInstance(filename, true);
 
-                setUploadStatus('<i class="fa-solid fa-spinner fa-spin mr-1"></i> Subiendo "' + escapeHtml(filename) + '" a tu Drive...', 'info');
+                setUploadStatus('<i class="fa-solid fa-spinner fa-spin mr-1"></i> Subiendo "' + escapeHtml(filename) + '" a la carpeta del instituto...', 'info');
 
-                const metadata = { name: filename, mimeType: 'application/pdf', parents: [folderId] };
+                const metadata = { name: filename, mimeType: 'application/pdf', parents: [DRIVE_FOLDER_ID] };
                 const sendUpload = (tok) => {
                     const formData = new FormData();
                     formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
@@ -2127,21 +1914,27 @@
                 if (response.ok) {
                     const result = await response.json();
                     setUploadStatus(
-                        '<i class="fa-solid fa-circle-check mr-1"></i> <strong>¡Subido con éxito a tu Google Drive!</strong><br>' +
+                        '<i class="fa-solid fa-circle-check mr-1"></i> <strong>¡Subido con éxito a la carpeta del instituto (PROYECTO STEAM VILLADIEGO)!</strong><br>' +
                         '<a href="https://drive.google.com/file/d/' + result.id + '/view" target="_blank" rel="noopener noreferrer" class="underline font-semibold">Abrir el PDF subido</a> · ' +
-                        '<a href="https://drive.google.com/drive/folders/' + folderId + '" target="_blank" rel="noopener noreferrer" class="underline">Ver la carpeta destino</a>',
+                        '<a href="https://drive.google.com/drive/folders/' + DRIVE_FOLDER_ID + '" target="_blank" rel="noopener noreferrer" class="underline">Ver la carpeta destino</a>',
                         'ok'
                     );
-                    showToast('Evidencia subida a tu Google Drive');
+                    showToast('Evidencia subida a la carpeta del instituto');
                 } else {
                     const errData = await response.json().catch(() => ({}));
-                    throw new Error(errData.error?.message || ('HTTP ' + response.status));
+                    const err = new Error(errData.error?.message || ('HTTP ' + response.status));
+                    err.status = response.status;
+                    throw err;
                 }
             } catch (e) {
-                setUploadStatus('<i class="fa-solid fa-triangle-exclamation mr-1"></i> No se pudo subir a tu Drive: ' + escapeHtml(e.message || 'error desconocido') + '. Comprueba que el ID de cliente OAuth esté autorizado para este origen y que el token tenga permisos de escritura.', 'err');
+                let hint = 'Comprueba que el ID de cliente OAuth esté autorizado para este origen y que el token tenga permisos de escritura.';
+                if (e.status === 403 || e.status === 404) {
+                    hint = 'Comprueba que tu cuenta de Google tenga permiso de EDICIÓN sobre la carpeta del instituto (pídelo a la coordinación del proyecto).';
+                }
+                setUploadStatus('<i class="fa-solid fa-triangle-exclamation mr-1"></i> No se pudo subir el PDF: ' + escapeHtml(e.message || 'error desconocido') + '. ' + hint, 'err');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> <span>Subir ahora a mi Google Drive</span>';
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> <span>Subir ahora a la carpeta del instituto</span>';
             }
         }
 
@@ -2167,7 +1960,6 @@
                     avatarImg.classList.add('hidden');
                     avatarIcon.classList.remove('hidden');
                 }
-                renderDriveFolderSelects();
             }
             updateApiDestinationHint();
         }
@@ -2175,11 +1967,7 @@
         function updateApiDestinationHint() {
             const hint = document.getElementById('api-destination-hint');
             if (!hint) return;
-            if (driveConfig.folderId) {
-                hint.innerHTML = 'a tu carpeta destino <strong>' + escapeHtml(driveConfig.folderName || driveConfig.folderId) + '</strong> de tu Google Drive';
-            } else {
-                hint.innerHTML = 'a la carpeta compartida <code class="bg-slate-100 px-1 rounded">1pwoT1VtoqGzuqv8A_eTzJY2VLfn_Uik2</code>';
-            }
+            hint.innerHTML = 'a la carpeta compartida <code class="bg-slate-100 px-1 rounded">1pwoT1VtoqGzuqv8A_eTzJY2VLfn_Uik2</code>';
         }
 
         // Actualizar todos los indicadores de conexión de la interfaz
@@ -2192,21 +1980,21 @@
             if (connected) {
                 btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500', 'border-emerald-400/40');
                 btn.classList.remove('bg-white/10', 'hover:bg-white/20', 'border-white/15');
-                btn.title = 'Google Drive conectado (' + (driveSession.email || '') + '). Clic para configurar la carpeta destino.';
+                btn.title = 'Google Drive conectado (' + (driveSession.email || '') + '). Clic para ver la configuración.';
                 label.textContent = driveSession.email || driveSession.name || 'Drive conectado';
                 label.classList.add('max-w-[160px]', 'truncate');
                 btnIcon.className = 'fa-solid fa-circle-check';
             } else {
                 btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500', 'border-emerald-400/40');
                 btn.classList.add('bg-white/10', 'hover:bg-white/20', 'border-white/15');
-                btn.title = 'Conectar con mi Google Drive';
-                label.textContent = 'Conectar mi Drive';
+                btn.title = 'Conectar con tu cuenta de Google Drive';
+                label.textContent = 'Conectar Google Drive';
                 label.classList.remove('max-w-[160px]', 'truncate');
                 btnIcon.className = 'fa-brands fa-google-drive text-emerald-300';
             }
 
             document.getElementById('btn-drive-upload-label').textContent =
-                connected ? 'Subir PDF a mi Drive' : 'Conectar Drive y subir PDF';
+                connected ? 'Subir PDF al Drive del instituto' : 'Conectar Drive y subir PDF';
 
             // Caja de estado del panel de configuración
             const stateBox = document.getElementById('settings-connection-state');
@@ -2220,21 +2008,14 @@
                 stateTitle.textContent = 'Conectado: ' + (driveSession.email || driveSession.name || 'cuenta de Google');
                 const expiry = new Date(driveSession.expiresAt).toLocaleTimeString('es-ES');
                 stateDetail.className = 'text-emerald-700';
-                stateDetail.textContent = 'Permiso: ' + (driveConfig.broadScope ? 'drive (todas las carpetas)' : 'drive.file (archivos creados por la app)') + ' · Sesión válida hasta las ' + expiry;
+                stateDetail.textContent = 'Los PDF se subirán a la carpeta del instituto (PROYECTO STEAM VILLADIEGO) · Sesión válida hasta las ' + expiry;
             } else {
                 stateBox.className = 'rounded-xl p-3.5 text-xs flex items-center gap-3 border bg-slate-50 border-slate-200';
                 stateIcon.className = 'fa-solid fa-circle-xmark text-slate-400 text-xl';
                 stateTitle.className = 'font-bold text-sm text-slate-700';
                 stateTitle.textContent = driveSession.token ? 'Sesión de Drive caducada' : 'Sin conexión con Google Drive';
                 stateDetail.className = 'text-slate-500';
-                stateDetail.textContent = 'Configura tu ID de cliente OAuth y pulsa "Conectar mi Drive".';
-            }
-
-            const folderNameEl = document.getElementById('settings-current-folder-name');
-            if (folderNameEl) {
-                folderNameEl.textContent = driveConfig.folderId
-                    ? (driveConfig.folderName || 'Carpeta ' + driveConfig.folderId) + ' (ID: ' + driveConfig.folderId + ')'
-                    : 'Sin carpeta seleccionada (se creará "' + DEFAULT_FOLDER_NAME + '" en la raíz al subir)';
+                stateDetail.textContent = 'Configura tu ID de cliente OAuth y pulsa "Conectar Google Drive".';
             }
 
             syncDriveModalState();
@@ -2244,8 +2025,6 @@
             loadDriveConfig();
             loadDriveSession();
             document.getElementById('input-oauth-clientid').value = driveConfig.clientId || '';
-            document.getElementById('chk-broad-scope').checked = !!driveConfig.broadScope;
-            renderDriveFolderSelects();
             if (driveSession.token) {
                 if (isDriveConnected()) {
                     refreshDriveAccountInfo();
@@ -2260,13 +2039,8 @@
         function openDriveSettings() {
             loadDriveConfig();
             document.getElementById('input-oauth-clientid').value = driveConfig.clientId || '';
-            document.getElementById('chk-broad-scope').checked = !!driveConfig.broadScope;
             document.getElementById('drive-settings-modal').classList.remove('hidden');
             updateDriveUI();
-            renderDriveFolderSelects();
-            if (isDriveConnected()) {
-                refreshDriveFolders();
-            }
         }
 
         function closeDriveSettings() {
@@ -2276,7 +2050,6 @@
         function saveDriveSettings() {
             const statusBox = document.getElementById('settings-status');
             const newClientId = document.getElementById('input-oauth-clientid').value.trim();
-            const newBroadScope = document.getElementById('chk-broad-scope').checked;
 
             if (newClientId && !/^[a-zA-Z0-9._-]+\.apps\.googleusercontent\.com$/.test(newClientId)) {
                 statusBox.className = 'text-xs rounded-lg p-2.5 block bg-amber-50 text-amber-800 border border-amber-200';
@@ -2284,19 +2057,17 @@
                 return;
             }
 
-            const scopeChanged = newBroadScope !== !!driveConfig.broadScope;
             const clientChanged = newClientId !== driveConfig.clientId;
 
             driveConfig.clientId = newClientId;
-            driveConfig.broadScope = newBroadScope;
             saveDriveConfig();
 
-            if (clientChanged || scopeChanged) {
+            if (clientChanged) {
                 resetTokenClient();
                 clearDriveSession();
                 updateDriveUI();
                 statusBox.className = 'text-xs rounded-lg p-2.5 block bg-sky-50 text-sky-800 border border-sky-200';
-                statusBox.innerHTML = '<i class="fa-solid fa-circle-info mr-1"></i> Configuración guardada. Pulsa <strong>Conectar mi Drive</strong> para autorizar con los nuevos ajustes.';
+                statusBox.innerHTML = '<i class="fa-solid fa-circle-info mr-1"></i> Configuración guardada. Pulsa <strong>Conectar Google Drive</strong> para autorizar con los nuevos ajustes.';
             } else {
                 statusBox.className = 'text-xs rounded-lg p-2.5 block bg-emerald-50 text-emerald-800 border border-emerald-200';
                 statusBox.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Configuración guardada.';
@@ -2308,14 +2079,11 @@
             const token = document.getElementById('gdrive-oauth-token').value.trim();
             const statusBox = document.getElementById('api-upload-status');
             const btn = document.getElementById('btn-api-upload');
-            const targetId = driveConfig.folderId || DRIVE_FOLDER_ID;
-            const targetName = driveConfig.folderId
-                ? (driveConfig.folderName ? 'tu carpeta "' + driveConfig.folderName + '"' : 'tu carpeta destino')
-                : 'la carpeta compartida Villadiego';
+            const targetName = 'la carpeta compartida Villadiego';
 
             if (!token) {
                 statusBox.className = 'text-xs rounded-lg p-2.5 bg-amber-50 text-amber-800 border border-amber-200 block';
-                statusBox.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> Introduce un Access Token OAuth válido o conecta tu cuenta con el botón "Conectar mi Drive".';
+                statusBox.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> Introduce un Access Token OAuth válido o conecta tu cuenta con el botón "Conectar Google Drive".';
                 return;
             }
 
@@ -2330,7 +2098,7 @@
                 const metadata = {
                     name: filename,
                     mimeType: 'application/pdf',
-                    parents: [targetId]
+                    parents: [DRIVE_FOLDER_ID]
                 };
 
                 const formData = new FormData();
