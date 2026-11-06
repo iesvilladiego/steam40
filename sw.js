@@ -21,9 +21,9 @@
  *      petición que no pertenezca a /steam40/ o a los CDN que usa esta
  *      app, dejándola en manos de la red o del SW del portal.
  *
- * Además, las llamadas a las APIs de Google (OAuth, Identity Services y
- * Google Drive) se dejan pasar SIEMPRE por la red y no se guardan nunca
- * en caché, porque transportan tokens de acceso y datos personales.
+ * La app ya no usa OAuth ni las APIs de Google Drive: el docente descarga
+ * el PDF generado y lo sube manualmente a la carpeta compartida del IES
+ * (drive.google.com se deja pasar siempre por la red, sin caché).
  *
  * ESTRATEGIAS DE CACHÉ
  * --------------------------------------------------------------------
@@ -33,7 +33,7 @@
  *  - CDN (Tailwind, Font Awesome,
  *    jsPDF, Google Fonts) ............ stale-while-revalidate: la app
  *                                     funciona sin conexión tras la 1ª visita.
- *  - APIs de Google .................. solo red, sin caché.
+ *  - drive.google.com ................ solo red, sin caché.
  *  - Todo lo demás ................... no se intercepta.
  *
  * Al publicar una nueva versión de la app, incrementa VERSION para que
@@ -42,7 +42,7 @@
 
 'use strict';
 
-const VERSION = 'v1.2.1';
+const VERSION = 'v1.3.1';
 const CACHE_NAME = 'steam40-evidencias-' + VERSION;
 const TIEMPO_LIMITE_NAV = 5000; // ms: máx. espera de red en navegaciones
 
@@ -72,12 +72,9 @@ const HOSTS_CDN = [
   'fonts.gstatic.com'      // Ficheros woff2 de Google Fonts
 ];
 
-// Servicios de Google con tokens/datos personales: nunca se interceptan.
+// Carpetas de Google Drive abiertas por la app (sin datos de sesión de la
+// app): nunca se interceptan.
 const HOSTS_SOLO_RED = [
-  'accounts.google.com',          // Google Identity Services (OAuth)
-  'oauth2.googleapis.com',        // Revocación de tokens
-  'www.googleapis.com',           // UserInfo + Google Drive API (v3 y uploads)
-  'content-drive.googleapis.com', // Endpoint alternativo de subida a Drive
   'drive.google.com'              // Carpeta compartida del proyecto
 ];
 
