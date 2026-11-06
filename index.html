@@ -197,6 +197,7 @@
                     </div>
                     <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
                         Evidencias STEAM4.0
+                        <span id="app-version-chip" class="hidden text-[10px] font-mono font-semibold tracking-normal bg-white/10 text-sky-200 border border-white/20 px-2 py-0.5 rounded-full select-none" title="Versión de la aplicación"></span>
                     </h1>
                 </div>
             </div>
@@ -2294,16 +2295,51 @@
          afectan al portal superior https://iesvilladiego.github.io/.
          ================================================================== -->
     <script>
+        // Chip de versión del encabezado: la versión la aporta el service
+        // worker activo (constante VERSION de sw.js), única fuente de verdad.
+        // Si no hay service worker (archivo abierto con file://, navegador
+        // antiguo), el chip permanece oculto en lugar de mostrar una versión
+        // fija que podría quedar desfasada respecto a la publicada.
+        function mostrarVersionEnChip(version) {
+            const chip = document.getElementById('app-version-chip');
+            if (!chip || !version) return;
+            chip.textContent = version;
+            chip.title = 'Versión instalada: ' + version + ' (según el service worker)';
+            chip.classList.remove('hidden');
+        }
+
+        function pedirVersionAlServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            // "ready" espera a que exista un service worker activo para este
+            // ámbito: cubre tanto la primera visita (tras activarse) como las
+            // siguientes (ya activo desde el arranque).
+            navigator.serviceWorker.ready.then((registro) => {
+                const worker = registro.active;
+                if (!worker) return;
+                const canal = new MessageChannel();
+                canal.port1.onmessage = (evento) => {
+                    if (evento.data && evento.data.type === 'VERSION') {
+                        mostrarVersionEnChip(evento.data.version);
+                    }
+                };
+                worker.postMessage({ type: 'GET_VERSION' }, [canal.port2]);
+            }).catch(() => { /* sin service worker activo: chip oculto */ });
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js', { scope: './' })
                     .then((registro) => {
                         console.log('[PWA] Service Worker registrado con ámbito:', registro.scope);
+                        pedirVersionAlServiceWorker();
                     })
                     .catch((error) => {
                         console.warn('[PWA] No se pudo registrar el Service Worker:', error);
                     });
             });
+            // Si un service worker nuevo toma el control de la página (p. ej.
+            // tras SKIP_WAITING), se vuelve a preguntar y el chip se refresca.
+            navigator.serviceWorker.addEventListener('controllerchange', pedirVersionAlServiceWorker);
         }
     </script>
 </body>
