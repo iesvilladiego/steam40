@@ -235,7 +235,7 @@
                 <div>
                     <h2 class="text-sm font-bold text-slate-800">Registro de Evidencias de Aula y Situaciones de Aprendizaje (Apartado 2.4 Séneca)</h2>
                     <p class="text-xs text-slate-600 mt-0.5">
-                        Redacta o edita tu evidencia de trabajo STEAM, selecciona los materiales utilizados, añade los enlaces o fotografías del resultado y genera el documento PDF oficial: la aplicación lo descarga automáticamente en tu equipo para que solo tengas que subirlo a la carpeta compartida del Google Drive del <strong>PROYECTO STEAM VILLADIEGO</strong>.
+                        Redacta o edita tu evidencia de trabajo STEAM, selecciona los materiales utilizados, añade los enlaces o fotografías del resultado y genera el documento PDF oficial: la aplicación lo envía <strong>directamente a la carpeta compartida del Google Drive del instituto</strong> (PROYECTO STEAM VILLADIEGO) sin que tengas que subir nada a mano. Si el envío fallara, la app descarga el PDF en tu equipo para que puedas subirlo manualmente.
                     </p>
                 </div>
             </div>
@@ -466,15 +466,15 @@
                     </div>
 
                     <div class="flex items-center gap-2.5 flex-wrap w-full sm:w-auto justify-end">
-                        <!-- Botón principal: genera y descarga el PDF, y abre la carpeta compartida del instituto -->
+                        <!-- Botón principal: genera el PDF y lo envía directamente a la carpeta del IES -->
                         <button onclick="openDriveUploadWorkflow()" id="btn-drive-upload"
                             class="flex-1 sm:flex-initial justify-center bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-md">
-                            <i class="fa-solid fa-file-arrow-down text-base"></i>
-                            <span id="btn-drive-upload-label">Generar PDF y subir a la carpeta del IES</span>
+                            <i class="fa-solid fa-paper-plane text-base"></i>
+                            <span id="btn-drive-upload-label">Generar PDF y enviar al Drive del IES</span>
                         </button>
 
-                        <!-- Descarga del PDF sin abrir la carpeta (por si se prefiere guardar en otro sitio) -->
-                        <button onclick="downloadPDF(false)" id="btn-download-pdf"
+                        <!-- Descarga del PDF en el equipo sin enviarlo al Drive -->
+                        <button onclick="downloadPDF()" id="btn-download-pdf"
                             class="flex-1 sm:flex-initial justify-center bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-file-pdf text-red-400 text-base"></i>
                             <span>Solo descargar</span>
@@ -623,15 +623,15 @@
         </div>
     </main>
 
-    <!-- MODAL: PDF GENERADO, LISTO PARA SUBIR A LA CARPETA COMPARTIDA DEL IES -->
+    <!-- MODAL DE ENVÍO DE LA EVIDENCIA AL DRIVE DEL IES -->
     <div id="drive-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
             <!-- Cabecera del Modal -->
             <div class="bg-gradient-to-r from-emerald-600 to-teal-700 px-6 py-4 text-white flex justify-between items-center">
                 <div class="flex items-center gap-2.5">
-                    <i class="fa-solid fa-file-circle-check text-2xl"></i>
+                    <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
                     <div>
-                        <h3 class="font-bold text-base">PDF listo para subir al Drive del instituto</h3>
+                        <h3 class="font-bold text-base">Envío de la evidencia al Drive del IES</h3>
                         <p class="text-xs text-emerald-100">PROYECTO STEAM VILLADIEGO</p>
                     </div>
                 </div>
@@ -641,33 +641,72 @@
             </div>
 
             <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                <!-- Confirmación de descarga automática del PDF -->
-                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
-                    <div class="bg-emerald-600 text-white rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5 text-xs">
-                        <i class="fa-solid fa-check"></i>
-                    </div>
-                    <div class="text-xs text-emerald-950">
-                        <p class="font-bold text-sm mb-0.5">Documento PDF generado y descargado en tu equipo</p>
-                        <p>El archivo <strong id="modal-filename" class="font-mono bg-white px-1.5 py-0.5 rounded border border-emerald-200">Evidencia_STEAM.pdf</strong> se ha guardado en tu carpeta de descargas. Solo falta subirlo a la carpeta del instituto.</p>
+                <!-- ESTADO 1: enviando -->
+                <div id="estado-enviando" class="hidden border border-sky-200 rounded-xl p-5 bg-sky-50/70 text-center">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-sky-600 mb-3"></i>
+                    <p class="font-bold text-sm text-sky-900 mb-1">Enviando el PDF a la carpeta del instituto...</p>
+                    <p class="text-xs text-slate-600">Generando el documento y transfiriéndolo al Google Drive del IES. Tardará solo unos segundos; no cierres esta ventana.</p>
+                    <div class="mt-4 h-1.5 w-full bg-sky-200 rounded-full overflow-hidden">
+                        <div class="h-full w-1/3 bg-sky-600 rounded-full animate-pulse mx-auto"></div>
                     </div>
                 </div>
 
-                <!-- Paso único: subir el PDF descargado a la carpeta compartida del IES -->
-                <div class="border border-emerald-300 rounded-xl p-4 bg-emerald-50/60">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-school text-emerald-600"></i> Sube el PDF a la carpeta compartida del instituto
+                <!-- ESTADO 2: enviado con éxito -->
+                <div id="estado-exito" class="hidden border border-emerald-300 rounded-xl p-5 bg-emerald-50/70 text-center">
+                    <div class="bg-emerald-600 text-white rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-3">
+                        <i class="fa-solid fa-check text-lg"></i>
+                    </div>
+                    <p class="font-bold text-sm text-emerald-900 mb-1">¡Evidencia enviada a la carpeta del instituto!</p>
+                    <p class="text-xs text-slate-600 mb-4">El archivo <strong id="modal-filename" class="font-mono bg-white px-1.5 py-0.5 rounded border border-emerald-200 break-all">Evidencia_STEAM.pdf</strong> ya está guardado en la carpeta compartida del PROYECTO STEAM VILLADIEGO. No hace falta subir nada más.</p>
+                    <div class="flex flex-col sm:flex-row gap-2 justify-center">
+                        <a id="enlace-pdf-subido" href="#" target="_blank" rel="noopener noreferrer"
+                           class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-file-arrow-up"></i> <span>Ver el PDF en Drive</span>
+                        </a>
+                        <a href="https://drive.google.com/drive/folders/1XWGHK5axfwiSNwKbM2wWnnul3ApVxBdQ?usp=drive_link" target="_blank" rel="noopener noreferrer"
+                           class="flex-1 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-folder-open"></i> <span>Abrir la carpeta</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ESTADO 3: error en el envío automático -->
+                <div id="estado-error" class="hidden border border-red-200 rounded-xl p-5 bg-red-50/70 text-center">
+                    <i class="fa-solid fa-triangle-exclamation text-3xl text-red-500 mb-3"></i>
+                    <p class="font-bold text-sm text-red-900 mb-1">No se pudo enviar el PDF automáticamente</p>
+                    <p id="modal-error-detalle" class="text-xs text-slate-600 mb-4">La aplicación no ha podido completar el envío. Detalle: error desconocido.</p>
+                    <button type="button" onclick="reintentarEnvioDrive()"
+                        class="bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm mx-auto">
+                        <i class="fa-solid fa-rotate-right"></i> <span>Reintentar el envío</span>
+                    </button>
+                </div>
+
+                <!-- ESTADO 4: envío directo no configurado todavía -->
+                <div id="estado-no-configurado" class="hidden border border-amber-300 rounded-xl p-5 bg-amber-50/70 text-center">
+                    <i class="fa-solid fa-plug-circle-xmark text-3xl text-amber-500 mb-3"></i>
+                    <p class="font-bold text-sm text-amber-900 mb-1">El envío directo todavía no está configurado</p>
+                    <p class="text-xs text-slate-600 mb-1">Falta desplegar el servicio de Apps Script del IES (o pegar su URL en la constante <code class="bg-white px-1 rounded">APPS_SCRIPT_URL</code> del archivo index.html; consulta <strong>INSTRUCCIONES_DESPLIEGUE.md</strong>).</p>
+                    <p class="text-xs text-slate-600">Mientras tanto, puedes entregar la evidencia con la subida manual de más abajo.</p>
+                </div>
+
+                <!-- Subida manual de respaldo (visible en error y no configurado) -->
+                <div id="bloque-manual" class="hidden border border-slate-200 rounded-xl p-4 bg-slate-50">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-hand-holding-heart text-amber-500"></i> Entrega manual de respaldo
                     </h4>
-                    <p class="text-[11px] text-slate-600 bg-white border border-emerald-200 rounded-lg px-3 py-2 mb-3 leading-relaxed">
-                        Se ha abierto la carpeta compartida del <strong>PROYECTO STEAM VILLADIEGO</strong> (Google Drive del IES) en otra pestaña. Arrastra ahí el PDF que acabas de descargar, o entra en ella y usa <em>" + Nuevo &gt; Subir archivo"</em>. Tu cuenta necesita permiso de <strong>editor</strong> sobre la carpeta.
+                    <p class="text-[11px] text-slate-600 mb-3 leading-relaxed">
+                        Descarga el PDF en tu equipo y arrástralo a la carpeta compartida del <strong>PROYECTO STEAM VILLADIEGO</strong> que se abrirá en otra pestaña (o usa <em>" + Nuevo &gt; Subir archivo"</em>). Necesitas permiso de <strong>editor</strong> sobre la carpeta.
                     </p>
-                    <a href="https://drive.google.com/drive/folders/1XWGHK5axfwiSNwKbM2wWnnul3ApVxBdQ?usp=drive_link" target="_blank" rel="noopener noreferrer"
-                       class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        <span>Abrir la carpeta Drive del IES (subir el PDF ahí)</span>
-                    </a>
-                    <p class="text-[10px] text-slate-500 mt-2 leading-normal text-center">
-                        Si tu navegador ha bloqueado la pestaña emergente, pulsa el botón de arriba para abrirla.
-                    </p>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button type="button" onclick="descargarYAbrirCarpeta()"
+                            class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-download"></i> <span>Descargar PDF y abrir la carpeta</span>
+                        </button>
+                        <a href="https://drive.google.com/drive/folders/1XWGHK5axfwiSNwKbM2wWnnul3ApVxBdQ?usp=drive_link" target="_blank" rel="noopener noreferrer"
+                           class="flex-1 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-folder-open"></i> <span>Solo abrir la carpeta</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -731,6 +770,20 @@
 
         const DRIVE_FOLDER_ID = "1XWGHK5axfwiSNwKbM2wWnnul3ApVxBdQ";
         const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1XWGHK5axfwiSNwKbM2wWnnul3ApVxBdQ?usp=drive_link";
+
+        // ── ENVÍO DIRECTO AL DRIVE DEL IES (Google Apps Script) ──────
+        // El PDF se envía a un pequeño servicio desplegado en la cuenta
+        // del IES que lo guarda en la carpeta compartida. Revisa
+        // INSTRUCCIONES_DESPLIEGUE.md para desplegarlo (10 minutos).
+        //
+        // 1. Pega en APPS_SCRIPT_URL la URL de la aplicación web que
+        //    te da Apps Script al desplegar (termina en "/exec").
+        // 2. APPS_SCRIPT_TOKEN debe coincidir con el TOKEN_SECRETO
+        //    del archivo apps-script/Codigo.gs.
+        // Si APPS_SCRIPT_URL queda vacía, el botón principal hace la
+        // subida manual (descarga el PDF y abre la carpeta).
+        const APPS_SCRIPT_URL = "";
+        const APPS_SCRIPT_TOKEN = "STEAM40-VILLADIEGO-8E0612651436507648920C8CAC4D969FF3319C66";
 
         // Estado actual de la evidencia
         let currentEvidence = {
@@ -1126,6 +1179,17 @@
             return `Evidencia_STEAM4.0_VILLADIEGO_${trim}T_${curso}_${docente}.pdf`;
         }
 
+        // Convierte un Blob (el PDF generado) a Base64 para enviarlo al
+        // servicio de Apps Script del IES dentro del JSON de la petición.
+        function blobABase64(blob) {
+            return new Promise((resolve, reject) => {
+                const lector = new FileReader();
+                lector.onload = () => resolve(lector.result.split(',')[1]);
+                lector.onerror = () => reject(new Error('No se pudo leer el PDF generado.'));
+                lector.readAsDataURL(blob);
+            });
+        }
+
         // GENERADOR VECTORIAL NATIVO A4 (210mm x 297mm exactos) CON JSPDF
         async function generatePdfInstance(filename, asBlob = false) {
             const { jsPDF } = window.jspdf;
@@ -1499,8 +1563,8 @@
             }
         }
 
-        // Generar y descargar el archivo PDF
-        async function downloadPDF(openModalAfter = false) {
+        // Generar y descargar el archivo PDF en el equipo del docente
+        async function downloadPDF() {
             const filename = getCleanFilename();
             const btn = document.getElementById('btn-download-pdf');
             const originalHtml = btn.innerHTML;
@@ -1511,11 +1575,6 @@
 
                 await generatePdfInstance(filename, false);
                 showToast('Documento PDF generado con estructura A4 oficial');
-
-                if (openModalAfter) {
-                    document.getElementById('modal-filename').textContent = filename;
-                    document.getElementById('drive-modal').classList.remove('hidden');
-                }
             } catch (err) {
                 console.error(err);
                 showToast('Error al generar el PDF. Inténtalo de nuevo.', true);
@@ -1525,19 +1584,125 @@
             }
         }
 
-        // Flujo de trabajo principal: guarda la evidencia en el historial,
-        // genera y descarga el PDF automáticamente y abre en una pestaña la
-        // carpeta compartida del Google Drive del instituto para que el
-        // docente solo tenga que soltar ahí el archivo descargado.
+        // =========================================================================
+        // ENVÍO DIRECTO DEL PDF A LA CARPETA DEL IES (Google Apps Script)
+        // El servicio desplegado en la cuenta del IES (apps-script/Codigo.gs)
+        // recibe el PDF y lo guarda en la carpeta compartida con sus permisos,
+        // de modo que el docente no necesita conectar su Google ni tener
+        // permiso sobre la carpeta. Si algo falla, queda la subida manual.
+        // =========================================================================
+
+        // Muestra en el modal de envío únicamente el estado indicado:
+        // 'enviando' | 'exito' | 'error' | 'no-configurado'. El bloque de
+        // subida manual solo aparece en los dos últimos.
+        function mostrarEstadoEnvio(estado) {
+            document.getElementById('drive-modal').classList.remove('hidden');
+            ['estado-enviando', 'estado-exito', 'estado-error', 'estado-no-configurado']
+                .forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('estado-' + estado).classList.remove('hidden');
+            document.getElementById('bloque-manual').classList.toggle('hidden', estado !== 'error' && estado !== 'no-configurado');
+        }
+
+        // Flujo de trabajo principal (botón "Generar PDF y enviar al Drive
+        // del IES"): guarda la evidencia en el historial y la envía directa-
+        // mente a la carpeta compartida del instituto.
         async function openDriveUploadWorkflow() {
             saveDraftToHistory(true); // Guarda copia automática en el historial
-            // La pestaña se abre aquí (antes de generar el PDF) porque los
-            // navegadores solo permiten abrir ventanas dentro del gesto de
-            // usuario del clic; si se esperase al final del await la bloquearían.
+
+            if (!APPS_SCRIPT_URL) {
+                // Servicio de envío no desplegado todavía: respaldo manual.
+                mostrarEstadoEnvio('no-configurado');
+                return;
+            }
+
+            const btn = document.getElementById('btn-drive-upload');
+            const originalHtml = btn.innerHTML;
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Enviando al IES...</span>';
+                await enviarPdfAlInstituto();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // Genera el PDF, lo envía al servicio de Apps Script y actualiza el
+        // modal con el resultado (éxito o error con reintento + respaldo).
+        async function enviarPdfAlInstituto() {
+            const nombreArchivo = getCleanFilename();
+            mostrarEstadoEnvio('enviando');
+            try {
+                const pdfBlob = await generatePdfInstance(nombreArchivo, true);
+                const datosBase64 = await blobABase64(pdfBlob);
+
+                // El POST es deliberadamente "simple" (Content-Type text/plain,
+                // sin cabeceras personalizadas): así el navegador no envía la
+                // petición OPTIONS previa de CORS, que Apps Script no sabe
+                // atender. El JSON viaja como texto plano y el token va dentro.
+                const control = new AbortController();
+                const temporizador = setTimeout(() => control.abort(), 60000);
+                let respuesta;
+                try {
+                    respuesta = await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                        body: JSON.stringify({
+                            token: APPS_SCRIPT_TOKEN,
+                            nombre: nombreArchivo,
+                            mime: 'application/pdf',
+                            datosBase64: datosBase64
+                        }),
+                        signal: control.signal
+                    });
+                } finally {
+                    clearTimeout(temporizador);
+                }
+
+                let resultado = null;
+                const texto = await respuesta.text();
+                try { resultado = JSON.parse(texto); } catch (e) { /* respuesta no JSON */ }
+
+                if (respuesta.ok && resultado && resultado.ok) {
+                    document.getElementById('modal-filename').textContent = resultado.nombre || nombreArchivo;
+                    const enlacePdf = document.getElementById('enlace-pdf-subido');
+                    if (resultado.url) {
+                        enlacePdf.href = resultado.url;
+                        enlacePdf.classList.remove('hidden');
+                    } else {
+                        enlacePdf.classList.add('hidden');
+                    }
+                    mostrarEstadoEnvio('exito');
+                    showToast('Evidencia enviada a la carpeta del Drive del IES');
+                } else if (!resultado) {
+                    // El servicio respondió algo que no es JSON (p. ej. una
+                    // página de error de Google): la URL no es la correcta.
+                    throw new Error('el servicio de envío ha respondido con una página inesperada; comprueba que la URL de APPS_SCRIPT_URL termine en "/exec" y el despliegue tenga acceso "Cualquier usuario"');
+                } else {
+                    throw new Error(resultado.error || ('HTTP ' + respuesta.status));
+                }
+            } catch (err) {
+                console.error('Envío al Drive del IES fallido:', err);
+                document.getElementById('modal-error-detalle').textContent =
+                    'Tu evidencia no se ha perdido: sigue guardada en el historial y puedes entregarla con la subida manual de abajo. Detalle del problema: ' +
+                    (err.name === 'AbortError' ? 'el servicio tardó más de 60 s en responder' : (err.message || 'error desconocido')) + '.';
+                mostrarEstadoEnvio('error');
+                showToast('No se pudo enviar el PDF automáticamente. Usa la subida manual.', true);
+            }
+        }
+
+        // Reintento del envío desde el modal de error.
+        function reintentarEnvioDrive() {
+            enviarPdfAlInstituto();
+        }
+
+        // Entrega manual de respaldo: descarga el PDF en el equipo y abre
+        // la carpeta compartida del IES en otra pestaña.
+        async function descargarYAbrirCarpeta() {
             const pestanaCarpeta = window.open(DRIVE_FOLDER_URL, '_blank', 'noopener');
-            await downloadPDF(true);
+            await downloadPDF();
             if (!pestanaCarpeta) {
-                showToast('Tu navegador ha bloqueado la pestaña de la carpeta Drive. Ábrela con el botón de la ventana o del encabezado.', true);
+                showToast('Tu navegador ha bloqueado la pestaña. Ábrela con el botón "Solo abrir la carpeta".', true);
             }
         }
 
