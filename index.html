@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Evidencias STEAM4.0 | PROYECTO STEAM VILLADIEGO</title>
 
     <!-- ==================================================================
@@ -168,16 +168,80 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-            border-radius: 9999px;
-            object-fit: cover;
-            border: 1px solid rgba(255,255,255,0.5);
+        /* scrollbar fino también en Firefox, y scroll interno "contenido"
+           (evita que el pull-to-refresh del móvil se cuele detrás de un modal) */
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ────────────────────────────────────────────────────────────
+           RESPUESTA MÓVIL / TABLET Y MULTIPLATAFORMA
+           ──────────────────────────────────────────────────────────── */
+        /* Evita que iOS infle el texto al girar el dispositivo */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        /* Sin destello gris al tocar controles en Android/iOS */
+        body { -webkit-tap-highlight-color: transparent; }
+        /* Elimina el retardo de ~300 ms del doble toque en enlaces y botones;
+           el zoom por pellizco de página queda intacto (accesibilidad) */
+        button, a, input, select, textarea, label { touch-action: manipulation; }
+        /* Los inputs que comparten fila flex con un botón (añadir material,
+           insertar enlace) no pueden encoger bajo su ancho intrínseco y
+           desbordan la tarjeta en pantallas estrechas */
+        input { min-width: 0; }
+
+        /* En pantallas táctiles: texto de 16 px en los campos (evita el
+           auto-zoom de iOS Safari al enfocar) y objetivos de toque cómodos */
+        @media (pointer: coarse) {
+            input, select, textarea { font-size: 16px !important; }
+            button:not(.btn-mini), input, select, textarea { min-height: 44px; }
+            input[type="file"] { min-height: 0; }
+        }
+
+        /* Los borrados de miniaturas solo se muestran con hover; en táctil
+           no existe el hover, así que se muestran siempre */
+        .thumb-del { opacity: 0; transition: opacity .15s ease; }
+        .group:hover .thumb-del { opacity: 1; }
+        @media (hover: none) { .thumb-del { opacity: 1; } }
+
+        /* Modales como hoja inferior deslizante en móvil (en escritorio,
+           cuadro centrado clásico). La clase .hidden los mantiene ocultos. */
+        .modal-sheet:not(.hidden) { display: flex; }
+        .sheet-panel { animation: subirHoja 0.22s ease-out; }
+        @keyframes subirHoja {
+            from { transform: translateY(30px); opacity: 0.5; }
+            to   { transform: translateY(0);   opacity: 1; }
+        }
+
+        /* Respeto a usuarios con animación reducida (vértigo, accesibilidad) */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Cabecera, sello y pie de la hoja A4: sus anchos fijos en px
+           desbordan en pantallas estrechas; se vuelven fluidos. La URL del
+           pie y el REF en monospace son más anchos que un móvil de 360 px
+           y no se parten solos: word-break permite el corte (solo afecta
+           a la vista en pantalla; el PDF los escribe jsPDF ya troceados) */
+        @media (max-width: 640px) {
+            .a4-head-logo { width: 62px !important; }
+            .a4-head-logo div:first-child { font-size: 18px !important; }
+            .a4-head-logo div:nth-child(2) { font-size: 10px !important; letter-spacing: .5px !important; }
+            .a4-head-meta { width: 36% !important; word-break: break-all; }
+            .a4-foot-stamp { width: 42% !important; }
+            .a4-foot-drive-url { word-break: break-all; }
         }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 
     <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
-    <header class="bg-gradient-to-r from-steam-900 via-steam-800 to-indigo-900 text-white shadow-lg sticky top-0 z-30">
+    <header class="bg-gradient-to-r from-steam-900 via-steam-800 to-indigo-900 text-white shadow-lg sticky top-0 z-30" style="padding-top: env(safe-area-inset-top, 0px)">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
                 <div class="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/20 flex items-center justify-center">
@@ -212,7 +276,7 @@
                 <button onclick="toggleHistoryModal()" class="text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5 border border-white/15 relative">
                     <i class="fa-solid fa-folder-open text-amber-300"></i>
                     <span>Mis Evidencias</span>
-                    <span id="saved-count-badge" class="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">0</span>
+                        <span id="saved-count-badge" class="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
                 </button>
 
                 <!-- Enlace a la carpeta compartida del Drive del instituto -->
@@ -226,7 +290,7 @@
     </header>
 
     <!-- CONTENIDO PRINCIPAL: EDITOR A LA IZQUIERDA, PREVISUALIZACIÓN PDF A LA DERECHA -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-28 lg:pb-6">
 
         <!-- Banner Informativo del Proyecto -->
         <div class="mb-6 bg-white rounded-xl p-4 shadow-sm border-l-4 border-steam-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -331,7 +395,7 @@
                                     <option value="1º Trimestre">1º Trimestre</option>
                                     <option value="2º Trimestre">2º Trimestre</option>
                                     <option value="3º Trimestre">3º Trimestre</option>
-                                    <option value=" Proyecto Anual (Curso Completo)">Proyecto Anual</option>
+                                    <option value="Proyecto Anual (Curso Completo)">Proyecto Anual</option>
                                 </select>
                             </div>
 
@@ -470,16 +534,18 @@
                     </div>
 
                     <div class="flex items-center gap-2.5 flex-wrap w-full sm:w-auto justify-end">
-                        <!-- Botón principal: genera el PDF y lo envía directamente a la carpeta del IES -->
+                        <!-- Botón principal: genera el PDF y lo envía directamente a la carpeta del IES.
+                             La clase .btn-drive-upload la comparten la toolbar y la barra fija móvil. -->
                         <button onclick="openDriveUploadWorkflow()" id="btn-drive-upload"
-                            class="flex-1 sm:flex-initial justify-center bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-md">
+                            class="btn-drive-upload flex-1 sm:flex-initial justify-center bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-md">
                             <i class="fa-solid fa-paper-plane text-base"></i>
                             <span id="btn-drive-upload-label">Generar PDF y enviar al Drive del IES</span>
                         </button>
 
-                        <!-- Descarga del PDF en el equipo sin enviarlo al Drive -->
+                        <!-- Descarga del PDF en el equipo sin enviarlo al Drive.
+                             La clase .btn-download-pdf la comparten la toolbar y la barra fija móvil. -->
                         <button onclick="downloadPDF()" id="btn-download-pdf"
-                            class="flex-1 sm:flex-initial justify-center bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-sm">
+                            class="btn-download-pdf flex-1 sm:flex-initial justify-center bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-file-pdf text-red-400 text-base"></i>
                             <span>Solo descargar</span>
                         </button>
@@ -494,7 +560,7 @@
                             <!-- 1. ENCABEZADO OFICIAL EN TABLA ESTRUCTURADA -->
                             <table style="width: 100%; border-collapse: collapse; border: 2px solid #075985; margin-bottom: 16px;">
                                 <tr>
-                                    <td style="width: 75px; background-color: #075985; color: #ffffff; text-align: center; vertical-align: middle; padding: 10px;">
+                                    <td class="a4-head-logo" style="width: 75px; background-color: #075985; color: #ffffff; text-align: center; vertical-align: middle; padding: 10px;">
                                         <div style="font-size: 24px; font-weight: 900; line-height: 1; color: #34d399;">STEAM</div>
                                         <div style="font-size: 13px; font-weight: 800; letter-spacing: 1px; margin-top: 2px; color: #ffffff;">4.0</div>
                                     </td>
@@ -509,7 +575,7 @@
                                             Ficha Oficial de Seguimiento de Actividades y Situaciones de Aprendizaje STEAM
                                         </div>
                                     </td>
-                                    <td style="width: 165px; padding: 10px 12px; text-align: right; vertical-align: middle; background-color: #f0f9ff; border-left: 1px solid #bae6fd;">
+                                    <td class="a4-head-meta" style="width: 165px; padding: 10px 12px; text-align: right; vertical-align: middle; background-color: #f0f9ff; border-left: 1px solid #bae6fd;">
                                         <div id="pdf-trimestre-badge" style="display: inline-block; background-color: #0284c7; color: #ffffff; font-weight: 800; font-size: 11px; padding: 3px 10px; border-radius: 4px;">
                                             1º Trimestre
                                         </div>
@@ -608,9 +674,9 @@
                                 <tr>
                                     <td style="padding-top: 8px; vertical-align: middle; font-size: 10px; color: #475569; line-height: 1.4;">
                                         <div style="font-weight: 800; color: #0f172a; font-size: 10.5px;">PROYECTO STEAM VILLADIEGO · Aplicación Evidencias STEAM4.0</div>
-                                        <div>Carpeta Oficial Drive: <span style="color: #0369a1; text-decoration: underline;">https://drive.google.com/drive/folders/1XWGHK5axfwiSNwKbM2wWnnul3ApVxBdQ</span></div>
+                                        <div class="a4-foot-drive-url">Carpeta Oficial Drive: <span style="color: #0369a1; text-decoration: underline;">https://drive.google.com/drive/folders/1XWGHK5axfwiSNwKbM2wWnnul3ApVxBdQ</span></div>
                                     </td>
-                                    <td style="padding-top: 8px; text-align: right; vertical-align: middle; width: 210px;">
+                                    <td class="a4-foot-stamp" style="padding-top: 8px; text-align: right; vertical-align: middle; width: 210px;">
                                         <div style="border: 1px solid #94a3b8; background-color: #f8fafc; border-radius: 4px; padding: 5px 10px; display: inline-block; text-align: center;">
                                             <div style="font-size: 9px; font-weight: 800; text-transform: uppercase; color: #075985;">Coordinación STEAM 4.0</div>
                                             <div style="font-size: 9px; color: #64748b;">Documento registrado para Séneca</div>
@@ -627,11 +693,16 @@
         </div>
     </main>
 
-    <!-- MODAL DE ENVÍO DE LA EVIDENCIA AL DRIVE DEL IES -->
-    <div id="drive-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+    <!-- MODAL DE ENVÍO DE LA EVIDENCIA AL DRIVE DEL IES
+         (en móvil se abre como hoja inferior deslizante) -->
+    <div id="drive-modal" class="modal-sheet fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="sheet-panel bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] sm:max-h-none flex flex-col">
+            <!-- Asa de arrastre visible solo en móvil (hoja inferior) -->
+            <div class="sm:hidden pt-2 pb-0.5 flex justify-center shrink-0" aria-hidden="true">
+                <div class="w-10 h-1.5 rounded-full bg-slate-300"></div>
+            </div>
             <!-- Cabecera del Modal -->
-            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 px-6 py-4 text-white flex justify-between items-center">
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 px-6 py-4 text-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2.5">
                     <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
                     <div>
@@ -644,7 +715,7 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            <div class="p-5 sm:p-6 space-y-5 flex-grow min-h-0 overflow-y-auto custom-scrollbar overscroll-contain">
                 <!-- ESTADO 1: enviando -->
                 <div id="estado-enviando" class="hidden border border-sky-200 rounded-xl p-5 bg-sky-50/70 text-center">
                     <i class="fa-solid fa-cloud-arrow-up text-3xl text-sky-600 mb-3"></i>
@@ -714,40 +785,67 @@
                 </div>
             </div>
 
-            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end">
-                <button onclick="closeDriveModal()" class="text-xs font-semibold text-slate-600 hover:text-slate-800 px-4 py-1.5 rounded-lg border border-slate-300 bg-white">
+            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end shrink-0"
+                 style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px))">
+                <button onclick="closeDriveModal()" class="text-xs font-semibold text-slate-600 hover:text-slate-800 px-4 py-2 rounded-lg border border-slate-300 bg-white">
                     Cerrar ventana
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE HISTORIAL DE EVIDENCIAS GUARDADAS -->
-    <div id="history-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden">
-            <div class="bg-slate-800 px-6 py-4 text-white flex justify-between items-center">
+    <!-- MODAL DE HISTORIAL DE EVIDENCIAS GUARDADAS
+         (en móvil se abre como hoja inferior deslizante) -->
+    <div id="history-modal" class="modal-sheet fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="sheet-panel bg-white rounded-t-3xl sm:rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] sm:max-h-none flex flex-col">
+            <div class="sm:hidden pt-2 pb-0.5 flex justify-center shrink-0" aria-hidden="true">
+                <div class="w-10 h-1.5 rounded-full bg-slate-300"></div>
+            </div>
+            <div class="bg-slate-800 px-6 py-4 text-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-folder-open text-amber-400"></i>
                     <h3 class="font-bold text-base">Mis Evidencias Guardadas (Editar / Recuperar)</h3>
                 </div>
-                <button onclick="toggleHistoryModal()" class="text-white/80 hover:text-white text-lg">
+                <button onclick="toggleHistoryModal()" class="text-white/80 hover:text-white text-lg w-9 h-9 -mr-1.5 flex items-center justify-center rounded-lg" aria-label="Cerrar">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div class="p-6 max-h-[65vh] overflow-y-auto custom-scrollbar" id="history-list-container">
+            <div class="p-5 sm:p-6 flex-grow min-h-0 overflow-y-auto custom-scrollbar overscroll-contain" id="history-list-container"
+                 style="padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px))">
                 <!-- Se puebla dinámicamente -->
             </div>
-            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-between items-center">
+            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between sm:items-center shrink-0">
                 <span class="text-xs text-slate-500">Las evidencias se guardan en el almacenamiento local de tu navegador.</span>
-                <button onclick="toggleHistoryModal()" class="text-xs font-semibold text-slate-700 hover:bg-slate-200 px-4 py-1.5 rounded-lg border border-slate-300 bg-white">
+                <button onclick="toggleHistoryModal()" class="text-xs font-semibold text-slate-700 hover:bg-slate-200 px-4 py-2 rounded-lg border border-slate-300 bg-white shrink-0">
                     Cerrar
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- BARRA DE ACCIÓN FIJA (solo móvil y tablet vertical): los botones
+         principales siempre visibles, con la etiqueta corta para caber -->
+    <nav id="mobile-action-bar" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
+         style="padding-bottom: env(safe-area-inset-bottom, 0px)">
+        <div class="max-w-3xl mx-auto px-3 py-2 grid grid-cols-3 gap-2">
+            <button onclick="openDriveUploadWorkflow()" class="btn-drive-upload bg-gradient-to-r from-emerald-600 to-teal-600 active:from-emerald-500 active:to-teal-500 text-white font-bold py-2.5 px-2 rounded-xl text-[13px] leading-tight transition flex flex-col items-center justify-center gap-1 shadow-md min-h-[52px]" aria-label="Generar PDF y enviar al Drive del IES">
+                <i class="fa-solid fa-paper-plane text-base"></i>
+                <span>Enviar al IES</span>
+            </button>
+            <button onclick="downloadPDF()" class="btn-download-pdf bg-slate-800 active:bg-slate-900 text-white font-semibold py-2.5 px-2 rounded-xl text-[13px] leading-tight transition flex flex-col items-center justify-center gap-1 shadow-sm min-h-[52px]" aria-label="Descargar el PDF en el equipo">
+                <i class="fa-solid fa-file-pdf text-red-400 text-base"></i>
+                <span>Solo descargar</span>
+            </button>
+            <button onclick="guardarDesdeBarra()" class="bg-steam-700 active:bg-steam-800 text-white font-semibold py-2.5 px-2 rounded-xl text-[13px] leading-tight transition flex flex-col items-center justify-center gap-1 shadow-sm min-h-[52px]" aria-label="Guardar la evidencia en el historial del navegador">
+                <i class="fa-solid fa-floppy-disk text-sky-300 text-base"></i>
+                <span>Guardar</span>
+            </button>
+        </div>
+    </nav>
+
     <!-- NOTIFICACIÓN TOAST FLOTANTE -->
-    <div id="toast-notification" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-3 text-sm">
+    <div id="toast-notification" class="fixed z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-3 text-sm left-4 right-4 bottom-24 sm:left-auto sm:right-5 sm:bottom-5 sm:w-auto sm:max-w-md"
+         style="margin-bottom: env(safe-area-inset-bottom, 0px)">
         <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
         <span id="toast-message">Acción completada</span>
     </div>
@@ -997,10 +1095,10 @@
             container.innerHTML = '';
             currentEvidence.fotos.forEach((foto, idx) => {
                 const div = document.createElement('div');
-                div.className = 'relative w-16 h-16 rounded-lg overflow-hidden border border-slate-300 group';
+                div.className = 'relative w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-lg overflow-hidden border border-slate-300 group';
                 div.innerHTML = `
-                    <img src="${foto.dataUrl}" class="w-full h-full object-cover">
-                    <button type="button" onclick="removePhoto(${idx})" class="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                    <img src="${foto.dataUrl}" class="w-full h-full object-cover" alt="Foto ${idx + 1} de la evidencia">
+                    <button type="button" onclick="removePhoto(${idx})" class="thumb-del btn-mini absolute inset-0 bg-black/50 text-white flex items-center justify-center transition" aria-label="Quitar la foto ${idx + 1}">
                         <i class="fa-solid fa-trash text-xs"></i>
                     </button>
                 `;
@@ -1567,24 +1665,22 @@
             }
         }
 
-        // Generar y descargar el archivo PDF en el equipo del docente
+        // Generar y descargar el archivo PDF en el equipo del docente.
+        // La maquetación puede tardar en móviles: se desactivan y se les
+        // pone un spinner a TODOS los botones que lanzan esta acción
+        // (toolbar y barra fija móvil comparten .btn-download-pdf).
         async function downloadPDF() {
-            const filename = getCleanFilename();
-            const btn = document.getElementById('btn-download-pdf');
-            const originalHtml = btn.innerHTML;
-
+            const botones = Array.from(document.querySelectorAll('.btn-download-pdf'));
+            const originales = botones.map(b => b.innerHTML);
             try {
-                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Maquetando PDF...</span>`;
-                btn.disabled = true;
-
-                await generatePdfInstance(filename, false);
+                botones.forEach(b => { b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Maquetando PDF...</span>'; });
+                await generatePdfInstance(getCleanFilename(), false);
                 showToast('Documento PDF generado con estructura A4 oficial');
             } catch (err) {
                 console.error(err);
                 showToast('Error al generar el PDF. Inténtalo de nuevo.', true);
             } finally {
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
+                botones.forEach((b, i) => { b.disabled = false; b.innerHTML = originales[i]; });
             }
         }
 
@@ -1609,7 +1705,8 @@
 
         // Flujo de trabajo principal (botón "Generar PDF y enviar al Drive
         // del IES"): guarda la evidencia en el historial y la envía directa-
-        // mente a la carpeta compartida del instituto.
+        // mente a la carpeta compartida del instituto. Toolbar y barra fija
+        // móvil comparten .btn-drive-upload.
         async function openDriveUploadWorkflow() {
             saveDraftToHistory(true); // Guarda copia automática en el historial
 
@@ -1619,15 +1716,13 @@
                 return;
             }
 
-            const btn = document.getElementById('btn-drive-upload');
-            const originalHtml = btn.innerHTML;
+            const botones = Array.from(document.querySelectorAll('.btn-drive-upload'));
+            const originales = botones.map(b => b.innerHTML);
             try {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Enviando al IES...</span>';
+                botones.forEach(b => { b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Enviando al IES...</span>'; });
                 await enviarPdfAlInstituto();
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
+                botones.forEach((b, i) => { b.disabled = false; b.innerHTML = originales[i]; });
             }
         }
 
@@ -1698,6 +1793,14 @@
         // Reintento del envío desde el modal de error.
         function reintentarEnvioDrive() {
             enviarPdfAlInstituto();
+        }
+
+        // Guardado desde la barra de acción móvil: idéntico al botón
+        // "Guardar" del encabezado, con feedback claro de que funcionó
+        // (la barra permanece fija, así que el toast es el único aviso).
+        function guardarDesdeBarra() {
+            saveDraftToHistory();
+            showToast('Evidencia guardada en "Mis Evidencias" de este navegador');
         }
 
         // Entrega manual de respaldo: descarga el PDF en el equipo y abre
