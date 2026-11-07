@@ -42,7 +42,7 @@
 
 'use strict';
 
-const VERSION = 'v1.4.2';
+const VERSION = 'v1.4.1';
 const CACHE_NAME = 'steam40-evidencias-' + VERSION;
 const TIEMPO_LIMITE_NAV = 5000; // ms: máx. espera de red en navegaciones
 
