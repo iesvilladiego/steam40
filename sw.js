@@ -33,7 +33,7 @@
  *  - CDN (Tailwind, Font Awesome,
  *    jsPDF, Google Fonts) ............ stale-while-revalidate: la app
  *                                     funciona sin conexión tras la 1ª visita.
- *  - drive.google.com ................ solo red, sin caché.
+ *  - drive.google.com, Apps Script . solo red, sin caché.
  *  - Todo lo demás ................... no se intercepta.
  *
  * Al publicar una nueva versión de la app, incrementa VERSION para que
@@ -42,7 +42,7 @@
 
 'use strict';
 
-const VERSION = 'v1.3.2';
+const VERSION = 'v1.4.0';
 const CACHE_NAME = 'steam40-evidencias-' + VERSION;
 const TIEMPO_LIMITE_NAV = 5000; // ms: máx. espera de red en navegaciones
 
@@ -72,10 +72,14 @@ const HOSTS_CDN = [
   'fonts.gstatic.com'      // Ficheros woff2 de Google Fonts
 ];
 
-// Carpetas de Google Drive abiertas por la app (sin datos de sesión de la
-// app): nunca se interceptan.
+// Servicios de Google usados por la app para la entrega de evidencias
+// (carpeta compartida y servicio de subida de Apps Script): nunca se
+// interceptan. Las peticiones de envío son POST y este SW solo gestiona
+// GET, pero se dejan documentadas por si cambia la estrategia.
 const HOSTS_SOLO_RED = [
-  'drive.google.com'              // Carpeta compartida del proyecto
+  'drive.google.com',             // Carpeta compartida del proyecto
+  'script.google.com',            // Aplicación web de Apps Script (envío PDF)
+  'script.googleusercontent.com'  // Respuesta final de Apps Script (redirect)
 ];
 
 /* ------------------------------------------------------------------
